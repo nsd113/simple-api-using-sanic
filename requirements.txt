@@ -1,0 +1,3 @@
+Sanic==19.12
+
+sanic_auth==0.2
