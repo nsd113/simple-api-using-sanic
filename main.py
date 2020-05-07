@@ -1,45 +1,43 @@
 from sanic import Sanic, response
 from sanic.response import json
 from sanic_auth import Auth
-import tables
-import database
-import random
-import string
-
-def
+import database as db
 
 app = Sanic("API")
+auth = Auth(app)
+
 
 @app.route('/registration', methods=['POST'])
 async def login(request):
-    print(request.body) #clean
+    print(request.body) # clean after
     data = eval(request.body)
     username = data.get('username')
     password = data.get('password')
-    if not user_exist_chesk(username, password):
-        return msg'Pair user+password not found in db'#error massage
-
+    db.register_user_data_db(username, password)
     print(f"User: {username}, password: {password}")
     return json({'usernname': {username},
                  'password':{password}})
 
-#tables.registration_new_user_db(name=username, password=password) #откуда вызывать записть данных в бд
-
-auth = Auth(app)
 
 @app.route('/login', methods=['POST'])
 async def login(request):
     message = ''
-
-    username = request.form.get('username')
-    password = request.form.get('password')
-    # fetch user from database
-    user = database.DEFAULT_PATH.get(name=username) #how to pass database
-    if user and user.check_password(password):   # check_password????
-        auth.login_user(request, user)
+    data = eval(request.body)
+    username = data.get('username')
+    password = data.get('password')
+    # fetch user from db
+    token = db.login_user_db(username, password)
+    #auth.login_user(request, user=username)
         #return response.redirect('/profile')    что это. что надо вместо этого error message?
     return response.json({'usernname': {username},
-                          'password':{password}})
+                          'password':{password},
+                          'token':{token}})
+
+if __name__ == "__main__":
+  app.run(host="0.0.0.0", port=8080)
+  db.create_table()
+
+
 
 '''
 @app.route('/login', methods=['POST'])    # пример
@@ -52,8 +50,6 @@ async def login(request):
                  'password':{password}})
 '''
 
-if __name__ == "__main__":
-  app.run(host="0.0.0.0", port=8080)
 
 '''
 #def registration_info():
